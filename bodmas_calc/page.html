@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>BODMAS Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 50px;
+        }
+        h1 {
+            color: #333;
+        }
+        .calculator {
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        input {
+            padding: 10px;
+            width: calc(100% - 24px);
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        button {
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            background: #007BFF;
+            color: #fff;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        #result {
+            margin-top: 10px;
+            font-size: 18px;
+        }
+        #history {
+            margin-top: 20px;
+        }
+        #history ul {
+            list-style: none;
+            padding: 0;
+        }
+        #history li {
+            background: #e9ecef;
+            margin: 5px 0;
+            padding: 10px;
+            border-radius: 5px;
+        }
+    </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+            loadHistory();
+        });
+
+        function calculate() {
+            const expression = document.getElementById("expression").value;
+            fetch(`/calculate?expression=${encodeURIComponent(expression)}`)
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById("result").innerText = data;
+                    if (!data.startsWith("Error")) {
+                        addToHistory(expression, data);
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        function addToHistory(expression, result) {
+            const historyList = document.getElementById("history-list");
+            const historyItem = document.createElement("li");
+            historyItem.innerText = `${expression} = ${result}`;
+            historyList.appendChild(historyItem);
+            saveHistory();
+        }
+
+        function clearHistory() {
+            const historyList = document.getElementById("history-list");
+            historyList.innerHTML = '';
+            localStorage.removeItem('calculationHistory');
+        }
+
+        function saveHistory() {
+            const historyList = document.getElementById("history-list");
+            const historyItems = Array.from(historyList.children).map(item => item.innerText);
+            localStorage.setItem('calculationHistory', JSON.stringify(historyItems));
+        }
+
+        function loadHistory() {
+            const history = JSON.parse(localStorage.getItem('calculationHistory'));
+            if (history) {
+                const historyList = document.getElementById("history-list");
+                history.forEach(itemText => {
+                    const historyItem = document.createElement("li");
+                    historyItem.innerText = itemText;
+                    historyList.appendChild(historyItem);
+                });
+            }
+        }
+    </script>
+</head>
+<body>
+    <h1>BODMAS Calculator</h1>
+    <div class="calculator">
+        <input type="text" id="expression" placeholder="Enter expression">
+        <button onclick="calculate()">Calculate</button>
+        <button onclick="clearHistory()">Clear History</button>
+        <p id="result"></p>
+    </div>
+    <div id="history">
+        <h2>History</h2>
+        <ul id="history-list"></ul>
+    </div>
+</body>
+</html>
