@@ -53,7 +53,6 @@ class BODMASHandler(http.server.SimpleHTTPRequestHandler):
                         raise ValueError("Invalid character in expression")
                 stack.append(sign * num)
                 return sum(stack)
-            
             if re.search(r'[^0-9+\-*/(){}[\] ]', expr):
                 raise ValueError("Invalid characters in expression")
             
