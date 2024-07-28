@@ -2,7 +2,7 @@ import http.server
 import socketserver
 import urllib.parse
 
-PORT = 8000
+PORT = 8000 #where ptoject run
 
 class BODMASHandler(http.server.SimpleHTTPRequestHandler):
     def do_GET(self):
